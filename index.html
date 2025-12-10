@@ -67,6 +67,15 @@
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
+
+        .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
     </style>
 </head>
 <body>
@@ -184,7 +193,7 @@
                                         src={imageUrl}
                                         alt={`Carta Dixit ${cardNumber}`}
                                         onError={() => setImageError(true)}
-                                        className="w-full h-auto max-h-80 object-contain"       
+                                        className="w-full h-auto max-h-96 object-contain"       
                                         />
                                 ) : (
                                     <div className="w-full h-96 flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-bold text-4xl">
@@ -431,7 +440,7 @@
                                             <ChevronLeft size={32} />
                                         </button>
 
-                                        <div className="flex gap-2 md:gap-4 flex-1 justify-center overflow-x-auto py-2">
+                                       <div className="flex gap-2 md:gap-4 flex-1 justify-center overflow-x-auto py-2 scrollbar-hide">
                                             {currentCards.map((cardNum) => (
                                                 <DixitCard
                                                     key={cardNum}
