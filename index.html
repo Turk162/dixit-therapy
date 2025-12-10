@@ -26,9 +26,8 @@
         const { useState, useEffect } = React;
 
         // ===== CONFIGURAZIONE BASE URL =====
-        // Modifica questo URL con il percorso al tuo repository GitHub
-        const GITHUB_REPO_BASE = 'https://raw.githubusercontent.com/TUO-USERNAME/TUO-REPO/main/cards';
-        // Esempio: 'https://raw.githubusercontent.com/guidomesiano/dixit-therapy/main/cards'
+        // URL del tuo repository GitHub con le carte
+        const GITHUB_REPO_BASE = 'https://raw.githubusercontent.com/turk162/dixit-therapy/main/cards';
 
         // Icone Lucide come componenti
         const ChevronLeft = ({ size = 24, className = '' }) => (
@@ -66,7 +65,7 @@
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-lg p-6 max-w-md w-full">
                         <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-2xl font-bold text-gray-800">Configurazione Admin</h2>
+                            <h2 className="text-2xl font-bold text-gray-800">⚙️ Configurazione</h2>
                             <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
                                 <X size={24} />
                             </button>
@@ -99,17 +98,21 @@
                                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                                 />
                                 <p className="text-xs text-gray-500 mt-1">
-                                    URL base della cartella con le carte nel tuo repository
+                                    URL base della cartella con le carte (già configurato per il tuo repository)
+                                </p>
+                            </div>
+
+                            <div className="bg-green-50 border border-green-200 rounded-md p-3 text-sm">
+                                <p className="font-medium text-green-900 mb-1">✅ Il tuo repository:</p>
+                                <p className="text-green-800 font-mono text-xs break-all">
+                                    https://github.com/turk162/dixit-therapy
                                 </p>
                             </div>
 
                             <div className="bg-blue-50 border border-blue-200 rounded-md p-3 text-sm">
-                                <p className="font-medium text-blue-900 mb-1">Struttura repository:</p>
-                                <p className="text-blue-800 font-mono text-xs">
-                                    /cards/1.png<br />
-                                    /cards/2.png<br />
-                                    ...<br />
-                                    /cards/109.png
+                                <p className="font-medium text-blue-900 mb-1">💡 Suggerimento:</p>
+                                <p className="text-blue-800">
+                                    Puoi aprire questo pannello anche premendo <kbd className="px-2 py-1 bg-white border rounded">Ctrl+Shift+A</kbd>
                                 </p>
                             </div>
                             
@@ -231,13 +234,18 @@
                 setAllCards(shuffled);
             };
 
-            const [clickCount, setClickCount] = useState(0);
+            // Attivazione Admin con Ctrl+Shift+A
             useEffect(() => {
-                if (clickCount === 3) {
-                    setAdminMode(!adminMode);
-                    setClickCount(0);
-                }
-            }, [clickCount, adminMode]);
+                const handleKeyPress = (e) => {
+                    if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+                        e.preventDefault();
+                        setAdminMode(!adminMode);
+                        console.log('Admin mode:', !adminMode);
+                    }
+                };
+                window.addEventListener('keydown', handleKeyPress);
+                return () => window.removeEventListener('keydown', handleKeyPress);
+            }, [adminMode]);
 
             // Pagina di selezione
             if (currentPage === 'selection') {
@@ -247,19 +255,16 @@
 
                 return (
                     <div className="min-h-screen bg-gradient-to-br from-purple-100 via-blue-50 to-indigo-100 p-4 md:p-8">
-                        <div className="max-w-6xl mx-auto mb-8 flex justify-between items-center">
+                    <div className="max-w-6xl mx-auto mb-8 flex justify-between items-center">
                             <h1 className="text-2xl md:text-4xl font-bold text-gray-800">Carte Dixit Therapy</h1>
-                            <div onClick={() => setClickCount(clickCount + 1)} className="cursor-pointer">
-                                {adminMode && (
-                                    <button
-                                        onClick={() => setShowAdmin(true)}
-                                        className="bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-2"
-                                    >
-                                        <Settings size={20} />
-                                        <span className="hidden md:inline">Admin</span>
-                                    </button>
-                                )}
-                            </div>
+                            <button
+                                onClick={() => setShowAdmin(true)}
+                                className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors flex items-center gap-2"
+                                title="Configurazione (oppure premi Ctrl+Shift+A)"
+                            >
+                                <Settings size={20} />
+                                <span className="hidden md:inline">Impostazioni</span>
+                            </button>
                         </div>
 
                         <div className="max-w-6xl mx-auto mb-8">
