@@ -184,8 +184,8 @@
                                         src={imageUrl}
                                         alt={`Carta Dixit ${cardNumber}`}
                                         onError={() => setImageError(true)}
-                                        className="w-full h-auto"
-                                    />
+                                        className="w-full h-auto max-h-80 object-contain"       
+                                        />
                                 ) : (
                                     <div className="w-full h-96 flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-bold text-4xl">
                                         Carta {cardNumber}
