@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dixit Therapy - Carte per Sedute Terapeutiche</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+                sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // ===== CONFIGURAZIONE BASE URL =====
+        // Modifica questo URL con il percorso al tuo repository GitHub
+        const GITHUB_REPO_BASE = 'https://raw.githubusercontent.com/TUO-USERNAME/TUO-REPO/main/cards';
+        // Esempio: 'https://raw.githubusercontent.com/guidomesiano/dixit-therapy/main/cards'
+
+        // Icone Lucide come componenti
+        const ChevronLeft = ({ size = 24, className = '' }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+        );
+
+        const ChevronRight = ({ size = 24, className = '' }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+        );
+
+        const Settings = ({ size = 24, className = '' }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M12 1v6m0 6v6m-7-7h6m6 0h6"></path>
+            </svg>
+        );
+
+        const X = ({ size = 24, className = '' }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        );
+
+        // Configurazione amministratore
+        const AdminConfig = ({ config, onSave, onClose }) => {
+            const [numCards, setNumCards] = useState(config.totalCards);
+            const [repoUrl, setRepoUrl] = useState(config.repoUrl);
+
+            return (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-lg p-6 max-w-md w-full">
+                        <div className="flex justify-between items-center mb-4">
+                            <h2 className="text-2xl font-bold text-gray-800">Configurazione Admin</h2>
+                            <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+                                <X size={24} />
+                            </button>
+                        </div>
+                        
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Numero totale di carte (1-109)
+                                </label>
+                                <input
+                                    type="number"
+                                    min="1"
+                                    max="109"
+                                    value={numCards}
+                                    onChange={(e) => setNumCards(Math.min(109, Math.max(1, parseInt(e.target.value) || 1)))}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    URL Repository GitHub
+                                </label>
+                                <input
+                                    type="text"
+                                    value={repoUrl}
+                                    onChange={(e) => setRepoUrl(e.target.value)}
+                                    placeholder="https://raw.githubusercontent.com/user/repo/main/cards"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                />
+                                <p className="text-xs text-gray-500 mt-1">
+                                    URL base della cartella con le carte nel tuo repository
+                                </p>
+                            </div>
+
+                            <div className="bg-blue-50 border border-blue-200 rounded-md p-3 text-sm">
+                                <p className="font-medium text-blue-900 mb-1">Struttura repository:</p>
+                                <p className="text-blue-800 font-mono text-xs">
+                                    /cards/1.png<br />
+                                    /cards/2.png<br />
+                                    ...<br />
+                                    /cards/109.png
+                                </p>
+                            </div>
+                            
+                            <button
+                                onClick={() => {
+                                    onSave({ totalCards: numCards, repoUrl: repoUrl });
+                                    onClose();
+                                }}
+                                className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
+                            >
+                                Salva Configurazione
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Componente Carta Dixit
+        const DixitCard = ({ number, isSelected, onSelect, isPlaceholder, config }) => {
+            const [imageError, setImageError] = useState(false);
+            
+            const imageUrl = `${config.repoUrl}/${number}.jpg`;
+
+            if (isPlaceholder) {
+                return (
+                    <div className="w-40 h-56 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50 flex-shrink-0">
+                        <span className="text-gray-400 text-sm">Slot vuoto</span>
+                    </div>
+                );
+            }
+
+            return (
+                <div
+                    onClick={onSelect}
+                    className={`relative w-40 h-56 rounded-lg shadow-lg cursor-pointer transform transition-all duration-300 hover:scale-105 flex-shrink-0 ${
+                        isSelected ? 'ring-4 ring-green-500 scale-95' : ''
+                    }`}
+                >
+                    {!imageError ? (
+                        <img
+                            src={imageUrl}
+                            alt={`Carta Dixit ${number}`}
+                            onError={() => setImageError(true)}
+                            className="w-full h-full object-cover rounded-lg"
+                        />
+                    ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg text-white font-bold text-xl">
+                            Carta {number}
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        // App principale
+        function DixitTherapyApp() {
+            const [config, setConfig] = useState(() => {
+                const saved = localStorage.getItem('dixitConfig');
+                return saved ? JSON.parse(saved) : { 
+                    totalCards: 109, 
+                    repoUrl: GITHUB_REPO_BASE 
+                };
+            });
+            
+            const [showAdmin, setShowAdmin] = useState(false);
+            const [currentPage, setCurrentPage] = useState('selection');
+            const [allCards, setAllCards] = useState([]);
+            const [mainDeckIndex, setMainDeckIndex] = useState(0);
+            const [personalDeck, setPersonalDeck] = useState([]);
+            const [adminMode, setAdminMode] = useState(false);
+            const [notes, setNotes] = useState('');
+
+            // Inizializza le carte
+            useEffect(() => {
+                const cards = Array.from({ length: config.totalCards }, (_, i) => i + 1);
+                const shuffled = cards.sort(() => Math.random() - 0.5);
+                setAllCards(shuffled);
+            }, [config.totalCards]);
+
+            // Salva configurazione
+            const saveConfig = (newConfig) => {
+                setConfig(newConfig);
+                localStorage.setItem('dixitConfig', JSON.stringify(newConfig));
+                const cards = Array.from({ length: newConfig.totalCards }, (_, i) => i + 1);
+                const shuffled = cards.sort(() => Math.random() - 0.5);
+                setAllCards(shuffled);
+                setMainDeckIndex(0);
+                setPersonalDeck([]);
+            };
+
+            const getCurrentMainCards = () => {
+                return allCards.slice(mainDeckIndex, mainDeckIndex + 5);
+            };
+
+            const navigateMainDeck = (direction) => {
+                if (direction === 'next' && mainDeckIndex + 5 < allCards.length) {
+                    setMainDeckIndex(mainDeckIndex + 5);
+                } else if (direction === 'prev' && mainDeckIndex > 0) {
+                    setMainDeckIndex(Math.max(0, mainDeckIndex - 5));
+                }
+            };
+
+            const toggleCardInPersonalDeck = (cardNumber) => {
+                if (personalDeck.includes(cardNumber)) {
+                    setPersonalDeck(personalDeck.filter(c => c !== cardNumber));
+                } else if (personalDeck.length < 5) {
+                    setPersonalDeck([...personalDeck, cardNumber]);
+                }
+            };
+
+            const resetSession = () => {
+                setCurrentPage('selection');
+                setMainDeckIndex(0);
+                setPersonalDeck([]);
+                setNotes('');
+                const cards = Array.from({ length: config.totalCards }, (_, i) => i + 1);
+                const shuffled = cards.sort(() => Math.random() - 0.5);
+                setAllCards(shuffled);
+            };
+
+            const [clickCount, setClickCount] = useState(0);
+            useEffect(() => {
+                if (clickCount === 3) {
+                    setAdminMode(!adminMode);
+                    setClickCount(0);
+                }
+            }, [clickCount, adminMode]);
+
+            // Pagina di selezione
+            if (currentPage === 'selection') {
+                const currentCards = getCurrentMainCards();
+                const canGoNext = mainDeckIndex + 5 < allCards.length;
+                const canGoPrev = mainDeckIndex > 0;
+
+                return (
+                    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-blue-50 to-indigo-100 p-4 md:p-8">
+                        <div className="max-w-6xl mx-auto mb-8 flex justify-between items-center">
+                            <h1 className="text-2xl md:text-4xl font-bold text-gray-800">Carte Dixit Therapy</h1>
+                            <div onClick={() => setClickCount(clickCount + 1)} className="cursor-pointer">
+                                {adminMode && (
+                                    <button
+                                        onClick={() => setShowAdmin(true)}
+                                        className="bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-2"
+                                    >
+                                        <Settings size={20} />
+                                        <span className="hidden md:inline">Admin</span>
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="max-w-6xl mx-auto mb-8">
+                            <h2 className="text-xl md:text-2xl font-semibold text-gray-700 mb-4">Deck Principale</h2>
+                            <div className="bg-white rounded-xl shadow-xl p-4 md:p-6">
+                                <div className="flex items-center justify-between gap-2 md:gap-4">
+                                    <button
+                                        onClick={() => navigateMainDeck('prev')}
+                                        disabled={!canGoPrev}
+                                        className={`p-2 rounded-full flex-shrink-0 ${
+                                            canGoPrev
+                                                ? 'bg-blue-600 text-white hover:bg-blue-700'
+                                                : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                        } transition-colors`}
+                                    >
+                                        <ChevronLeft size={32} />
+                                    </button>
+
+                                    <div className="flex gap-2 md:gap-4 flex-1 justify-center overflow-x-auto py-2">
+                                        {currentCards.map((cardNum) => (
+                                            <DixitCard
+                                                key={cardNum}
+                                                number={cardNum}
+                                                isSelected={personalDeck.includes(cardNum)}
+                                                onSelect={() => toggleCardInPersonalDeck(cardNum)}
+                                                config={config}
+                                            />
+                                        ))}
+                                    </div>
+
+                                    <button
+                                        onClick={() => navigateMainDeck('next')}
+                                        disabled={!canGoNext}
+                                        className={`p-2 rounded-full flex-shrink-0 ${
+                                            canGoNext
+                                                ? 'bg-blue-600 text-white hover:bg-blue-700'
+                                                : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                        } transition-colors`}
+                                    >
+                                        <ChevronRight size={32} />
+                                    </button>
+                                </div>
+                                <div className="text-center mt-4 text-sm text-gray-600">
+                                    Carte {mainDeckIndex + 1}-{Math.min(mainDeckIndex + 5, allCards.length)} di {allCards.length}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="max-w-6xl mx-auto">
+                            <div className="flex flex-col md:flex-row items-end gap-4 md:gap-6">
+                                <div className="flex-1 w-full">
+                                    <h2 className="text-xl md:text-2xl font-semibold text-gray-700 mb-4">
+                                        Il Tuo Deck ({personalDeck.length}/5)
+                                    </h2>
+                                    <div className="bg-white rounded-xl shadow-xl p-4 md:p-6">
+                                        <div className="flex gap-2 md:gap-4 justify-center overflow-x-auto py-2">
+                                            {[0, 1, 2, 3, 4].map((index) => (
+                                                <div key={index}>
+                                                    {personalDeck[index] ? (
+                                                        <DixitCard
+                                                            number={personalDeck[index]}
+                                                            isSelected={false}
+                                                            onSelect={() => toggleCardInPersonalDeck(personalDeck[index])}
+                                                            config={config}
+                                                        />
+                                                    ) : (
+                                                        <DixitCard isPlaceholder={true} config={config} />
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button
+                                    onClick={() => setCurrentPage('your-cards')}
+                                    disabled={personalDeck.length === 0}
+                                    className={`w-full md:w-auto px-8 py-4 rounded-xl font-bold text-lg transition-all ${
+                                        personalDeck.length > 0
+                                            ? 'bg-green-600 text-white hover:bg-green-700 shadow-lg hover:shadow-xl transform hover:scale-105'
+                                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                    }`}
+                                >
+                                    Fine
+                                </button>
+                            </div>
+                        </div>
+
+                        {showAdmin && (
+                            <AdminConfig
+                                config={config}
+                                onSave={saveConfig}
+                                onClose={() => setShowAdmin(false)}
+                            />
+                        )}
+                    </div>
+                );
+            }
+
+            // Pagina "Le Tue Carte"
+            return (
+                <div className="min-h-screen bg-gradient-to-br from-green-100 via-blue-50 to-teal-100 p-4 md:p-8">
+                    <div className="max-w-6xl mx-auto">
+                        <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+                            <h1 className="text-2xl md:text-4xl font-bold text-gray-800 text-center md:text-left">
+                                Le Tue Carte Selezionate
+                            </h1>
+                            <button
+                                onClick={resetSession}
+                                className="w-full md:w-auto bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+                            >
+                                Nuova Sessione
+                            </button>
+                        </div>
+
+                        <div className="bg-white rounded-xl shadow-xl p-4 md:p-8 mb-6">
+                            <div className="flex gap-4 md:gap-6 justify-center flex-wrap">
+                                {personalDeck.map((cardNum) => (
+                                    <div key={cardNum} className="transform transition-transform hover:scale-110">
+                                        <DixitCard
+                                            number={cardNum}
+                                            isSelected={false}
+                                            onSelect={() => {}}
+                                            config={config}
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+
+                            {personalDeck.length === 0 && (
+                                <div className="text-center text-gray-500 py-12">
+                                    <p className="text-xl">Nessuna carta selezionata</p>
+                                    <button
+                                        onClick={resetSession}
+                                        className="mt-4 text-blue-600 hover:underline"
+                                    >
+                                        Torna alla selezione
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="bg-white rounded-xl shadow-lg p-4 md:p-6">
+                            <h2 className="text-xl font-semibold text-gray-700 mb-3">Note sulla sessione</h2>
+                            <textarea
+                                value={notes}
+                                onChange={(e) => setNotes(e.target.value)}
+                                className="w-full h-32 p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                                placeholder="Scrivi qui le tue riflessioni sulle carte scelte..."
+                            />
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Render dell'app
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<DixitTherapyApp />);
+    </script>
+</body>
+</html>
