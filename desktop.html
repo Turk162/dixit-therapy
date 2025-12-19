@@ -128,43 +128,44 @@ const GITHUB_REPO_BASE = 'https://raw.githubusercontent.com/turk162/dixit-therap
             );
         };
 
-        // Componente Carta Dixit
-        const DixitCard = ({ number, isSelected, onSelect, isPlaceholder, config }) => {
-            const [imageError, setImageError] = useState(false);
-            
-            const imageUrl = `${config.repoUrl}/${number}.jpg`;
+       // Componente Carta Dixit
+const DixitCard = ({ number, isSelected, onSelect, isPlaceholder, config }) => {
+    const [imageError, setImageError] = useState(false);
+    
+    const imageUrl = `${config.repoUrl}/${number}.jpg`;
 
-            if (isPlaceholder) {
-                return (
-                    <div className="w-40 h-56 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50 flex-shrink-0">
-                        <span className="text-gray-400 text-sm">Slot vuoto</span>
-                    </div>
-                );
-            }
+    if (isPlaceholder) {
+        return (
+            <div className="w-40 h-56 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50 flex-shrink-0">
+                <span className="text-gray-400 text-sm">Slot vuoto</span>
+            </div>
+        );
+    }
 
-            return (
-                <div
-                    onClick={onSelect}
-                    className={`relative w-40 h-56 rounded-lg shadow-lg cursor-pointer transform transition-all duration-300 hover:scale-105 flex-shrink-0 ${
-                        isSelected ? 'ring-4 ring-green-500 scale-95' : ''
-                    }`}
-                >
-                    {!imageError ? (
-                        <img
-                            src={imageUrl}
-                            alt={`Carta Dixit ${number}`}
-                            onError={() => setImageError(true)}
-                            className="w-full h-full object-cover rounded-lg"
-                        />
-                    ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg text-white font-bold text-xl">
-                            Carta {number}
-                        </div>
-                    )}
+    return (
+        <div
+            onClick={onSelect}
+            className={`relative w-40 h-56 rounded-lg shadow-lg cursor-pointer transform transition-all duration-300 
+                /* Modifica qui: aumentato scale e aggiunto z-50 in hover */
+                hover:scale-125 hover:z-50 hover:shadow-2xl flex-shrink-0 ${
+                isSelected ? 'ring-4 ring-green-500 scale-95' : ''
+            }`}
+        >
+            {!imageError ? (
+                <img
+                    src={imageUrl}
+                    alt={`Carta Dixit ${number}`}
+                    onError={() => setImageError(true)}
+                    className="w-full h-full object-cover rounded-lg"
+                />
+            ) : (
+                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg text-white font-bold text-xl">
+                    Carta {number}
                 </div>
-            );
-        };
-
+            )}
+        </div>
+    );
+};
         // App principale
         function DixitTherapyApp() {
             const [config, setConfig] = useState(() => {
