@@ -14,12 +14,13 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
                 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
             -webkit-font-smoothing: antialiased;
+            background-color: #f8fafc;
         }
         .modal-animate-in {
-            animation: fadeIn 0.2s ease-out;
+            animation: fadeIn 0.25s ease-out;
         }
         @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
+            from { opacity: 0; transform: scale(0.9); }
             to { opacity: 1; transform: scale(1); }
         }
     </style>
@@ -50,18 +51,18 @@
         const ZoomModal = ({ number, isSelected, onToggle, onClose, config }) => {
             const imageUrl = `${config.repoUrl}/${number}.jpg`;
             return (
-                <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[100] p-4 backdrop-blur-sm" onClick={onClose}>
+                <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[100] p-4 backdrop-blur-md" onClick={onClose}>
                     <div className="bg-white rounded-2xl max-w-sm w-full shadow-2xl modal-animate-in overflow-hidden" onClick={e => e.stopPropagation()}>
-                        <div className="relative">
-                            <img src={imageUrl} alt={`Carta ${number}`} className="w-full h-auto" />
-                            <button onClick={onClose} className="absolute top-2 right-2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70">
+                        <div className="relative aspect-[3/4] bg-gray-200">
+                            <img src={imageUrl} alt={`Carta ${number}`} className="w-full h-full object-cover" />
+                            <button onClick={onClose} className="absolute top-3 right-3 bg-black/40 text-white p-2 rounded-full hover:bg-black/60 transition-colors">
                                 <X size={20} />
                             </button>
                         </div>
                         <div className="p-6 space-y-3">
                             <button 
                                 onClick={() => { onToggle(number); onClose(); }}
-                                className={`w-full py-4 rounded-xl font-bold text-lg transition-all shadow-md ${
+                                className={`w-full py-4 rounded-xl font-bold text-lg transition-all transform active:scale-95 shadow-md ${
                                     isSelected 
                                     ? 'bg-red-500 hover:bg-red-600 text-white' 
                                     : 'bg-green-600 hover:bg-green-700 text-white'
@@ -81,33 +82,34 @@
         // --- COMPONENTE CARTA ---
         const DixitCard = ({ number, isSelected, onZoom, isPlaceholder, config }) => {
             const [imageError, setImageError] = useState(false);
-            const imageUrl = `${config.repoUrl}/${number}.jpg`;
-
+            
             if (isPlaceholder) {
                 return (
-                    <div className="w-40 h-56 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50 flex-shrink-0">
-                        <span className="text-gray-400 text-sm italic">Vuoto</span>
+                    <div className="w-40 h-56 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50 flex-shrink-0 shadow-inner">
+                        <span className="text-gray-400 text-sm italic">Slot vuoto</span>
                     </div>
                 );
             }
 
+            const imageUrl = `${config.repoUrl}/${number}.jpg`;
+
             return (
                 <div
                     onClick={() => onZoom(number)}
-                    className={`relative w-40 h-56 rounded-lg shadow-lg cursor-pointer transform transition-all duration-300 hover:scale-105 flex-shrink-0 ${
-                        isSelected ? 'ring-4 ring-green-500 scale-95 shadow-inner' : 'hover:shadow-2xl'
+                    className={`relative w-40 h-56 rounded-lg shadow-lg cursor-pointer transform transition-all duration-300 hover:scale-105 flex-shrink-0 overflow-hidden ${
+                        isSelected ? 'ring-4 ring-green-500 scale-95' : 'hover:shadow-2xl'
                     }`}
                 >
                     {!imageError ? (
                         <img src={imageUrl} alt={`Carta ${number}`} onError={() => setImageError(true)} className="w-full h-full object-cover rounded-lg" />
                     ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg text-white font-bold text-xl">
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-bold text-xl">
                             Carta {number}
                         </div>
                     )}
                     {isSelected && (
-                        <div className="absolute top-2 right-2 bg-green-500 text-white p-1 rounded-full shadow-md">
-                            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg>
+                        <div className="absolute top-2 right-2 bg-green-500 text-white p-1 rounded-full shadow-lg">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="4" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg>
                         </div>
                     )}
                 </div>
@@ -120,22 +122,22 @@
             const [repoUrl, setRepoUrl] = useState(config.repoUrl);
 
             return (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-xl">
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[110] p-4">
+                    <div className="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl">
                         <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-2xl font-bold text-gray-800">Configurazione Admin</h2>
+                            <h2 className="text-2xl font-bold text-gray-800">Admin Panel</h2>
                             <button onClick={onClose} className="text-gray-500 hover:text-gray-700"><X size={24} /></button>
                         </div>
                         <div className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Numero totale carte (1-109)</label>
-                                <input type="number" min="1" max="109" value={numCards} onChange={(e) => setNumCards(parseInt(e.target.value) || 1)} className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500" />
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Totale carte</label>
+                                <input type="number" value={numCards} onChange={(e) => setNumCards(parseInt(e.target.value) || 1)} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">URL Repository GitHub</label>
-                                <input type="text" value={repoUrl} onChange={(e) => setRepoUrl(e.target.value)} className="w-full px-3 py-2 border rounded-md text-sm" />
+                                <label className="block text-sm font-medium text-gray-700 mb-1">GitHub Base URL</label>
+                                <input type="text" value={repoUrl} onChange={(e) => setRepoUrl(e.target.value)} className="w-full px-3 py-2 border rounded-lg text-xs" />
                             </div>
-                            <button onClick={() => { onSave({ totalCards: numCards, repoUrl }); onClose(); }} className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors">Salva</button>
+                            <button onClick={() => { onSave({ totalCards: numCards, repoUrl }); onClose(); }} className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700">Salva Modifiche</button>
                         </div>
                     </div>
                 </div>
@@ -156,7 +158,7 @@
             const [personalDeck, setPersonalDeck] = useState([]);
             const [adminMode, setAdminMode] = useState(false);
             const [notes, setNotes] = useState('');
-            const [zoomedCard, setZoomedCard] = useState(null); // Stato per il Modal
+            const [zoomedCard, setZoomedCard] = useState(null);
             const [clickCount, setClickCount] = useState(0);
 
             useEffect(() => {
@@ -187,68 +189,82 @@
             const currentCards = allCards.slice(mainDeckIndex, mainDeckIndex + 5);
 
             return (
-                <div className={`min-h-screen p-4 md:p-8 ${currentPage === 'selection' ? 'bg-indigo-50' : 'bg-teal-50'}`}>
+                <div className={`min-h-screen p-4 md:p-8 transition-colors duration-500 ${currentPage === 'selection' ? 'bg-blue-50' : 'bg-emerald-50'}`}>
                     <div className="max-w-6xl mx-auto flex justify-between items-center mb-8">
-                        <h1 className="text-2xl md:text-4xl font-extrabold text-gray-800" onClick={() => setClickCount(clickCount + 1)}>Dixit Therapy</h1>
+                        <h1 className="text-3xl md:text-4xl font-black text-slate-800 tracking-tight cursor-default select-none" onClick={() => setClickCount(clickCount + 1)}>
+                            DIXIT<span className="text-blue-600 italic">Therapy</span>
+                        </h1>
                         {adminMode && (
-                            <button onClick={() => setShowAdmin(true)} className="bg-gray-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"><Settings size={20} /> Admin</button>
+                            <button onClick={() => setShowAdmin(true)} className="bg-slate-800 text-white px-4 py-2 rounded-xl flex items-center gap-2 hover:bg-slate-700 transition-all"><Settings size={18} /> Admin</button>
                         )}
                     </div>
 
                     {currentPage === 'selection' ? (
                         <>
-                            <div className="bg-white rounded-2xl shadow-xl p-6 mb-10">
-                                <h2 className="text-xl font-bold text-gray-700 mb-6">Scegli le tue carte</h2>
-                                <div className="flex items-center gap-4">
-                                    <button onClick={() => setMainDeckIndex(Math.max(0, mainDeckIndex - 5))} disabled={mainDeckIndex === 0} className="disabled:opacity-30"><ChevronLeft size={40} /></button>
-                                    <div className="flex gap-4 flex-1 justify-center overflow-x-auto py-4">
+                            <div className="bg-white rounded-3xl shadow-xl p-6 mb-8 border border-slate-100">
+                                <div className="flex items-center justify-between mb-4 px-2">
+                                    <h2 className="text-xl font-bold text-slate-700">Esplora le carte</h2>
+                                    <span className="text-sm text-slate-400 font-medium">{mainDeckIndex + 1}-{Math.min(mainDeckIndex + 5, allCards.length)} di {allCards.length}</span>
+                                </div>
+                                <div className="flex items-center gap-2 md:gap-4">
+                                    <button onClick={() => setMainDeckIndex(Math.max(0, mainDeckIndex - 5))} disabled={mainDeckIndex === 0} className="p-2 rounded-full hover:bg-slate-100 disabled:opacity-10 transition-all"><ChevronLeft size={32} /></button>
+                                    <div className="flex gap-4 flex-1 justify-center overflow-x-auto py-6">
                                         {currentCards.map(num => (
                                             <DixitCard key={num} number={num} isSelected={personalDeck.includes(num)} onZoom={setZoomedCard} config={config} />
                                         ))}
                                     </div>
-                                    <button onClick={() => setMainDeckIndex(mainDeckIndex + 5)} disabled={mainDeckIndex + 5 >= allCards.length} className="disabled:opacity-30"><ChevronRight size={40} /></button>
+                                    <button onClick={() => setMainDeckIndex(mainDeckIndex + 5)} disabled={mainDeckIndex + 5 >= allCards.length} className="p-2 rounded-full hover:bg-slate-100 disabled:opacity-10 transition-all"><ChevronRight size={32} /></button>
                                 </div>
                             </div>
 
-                            <div className="bg-white rounded-2xl shadow-xl p-6">
-                                <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-                                    <div className="flex-1">
-                                        <h2 className="text-xl font-bold text-gray-700 mb-4">Il Tuo Deck ({personalDeck.length}/5)</h2>
-                                        <div className="flex gap-4 overflow-x-auto py-2">
+                            <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100">
+                                <div className="flex flex-col md:flex-row justify-between items-center gap-8">
+                                    <div className="w-full">
+                                        <h2 className="text-xl font-bold text-slate-700 mb-6 flex items-center gap-2">
+                                            Il Tuo Deck 
+                                            <span className="bg-blue-100 text-blue-600 px-3 py-0.5 rounded-full text-sm">{personalDeck.length}/5</span>
+                                        </h2>
+                                        <div className="flex gap-4 justify-start md:justify-start overflow-x-auto pb-2">
                                             {[0, 1, 2, 3, 4].map(i => (
                                                 personalDeck[i] 
                                                 ? <DixitCard key={personalDeck[i]} number={personalDeck[i]} onZoom={setZoomedCard} config={config} />
-                                                : <DixitCard key={`empty-${i}`} isPlaceholder={true} />
+                                                : <DixitCard key={`empty-${i}`} isPlaceholder={true} config={config} />
                                             ))}
                                         </div>
                                     </div>
                                     <button 
                                         onClick={() => setCurrentPage('final')} 
                                         disabled={personalDeck.length === 0}
-                                        className="bg-green-600 text-white px-10 py-5 rounded-2xl font-black text-xl hover:bg-green-700 disabled:bg-gray-300 transition-all shadow-lg"
+                                        className="w-full md:w-auto bg-slate-900 text-white px-12 py-6 rounded-2xl font-bold text-xl hover:bg-blue-600 disabled:bg-slate-200 transition-all shadow-xl active:scale-95"
                                     >
-                                        VAI ALLE NOTE
+                                        PROSEGUI
                                     </button>
                                 </div>
                             </div>
                         </>
                     ) : (
-                        <div className="space-y-8">
-                            <div className="bg-white rounded-2xl shadow-xl p-8">
-                                <h2 className="text-2xl font-bold mb-6 text-center">Carte Selezionate</h2>
-                                <div className="flex flex-wrap gap-6 justify-center mb-8">
+                        <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-700">
+                            <div className="bg-white rounded-3xl shadow-2xl p-8 border border-slate-100">
+                                <h2 className="text-2xl font-bold mb-8 text-center text-slate-800">Le tue scelte</h2>
+                                <div className="flex flex-wrap gap-6 justify-center mb-10">
                                     {personalDeck.map(num => (
                                         <DixitCard key={num} number={num} onZoom={setZoomedCard} config={config} />
                                     ))}
                                 </div>
-                                <textarea 
-                                    value={notes} 
-                                    onChange={e => setNotes(e.target.value)}
-                                    placeholder="Scrivi qui le tue riflessioni..."
-                                    className="w-full h-40 p-4 border-2 rounded-xl focus:border-blue-500 outline-none text-lg shadow-inner"
-                                />
+                                <div className="space-y-4">
+                                    <label className="text-lg font-semibold text-slate-700 block">Note e riflessioni:</label>
+                                    <textarea 
+                                        value={notes} 
+                                        onChange={e => setNotes(e.target.value)}
+                                        placeholder="Cosa ti suggeriscono queste immagini?"
+                                        className="w-full h-48 p-6 border-2 border-slate-100 rounded-2xl focus:border-emerald-400 outline-none text-lg shadow-inner bg-slate-50/50 transition-colors"
+                                    />
+                                </div>
                             </div>
-                            <button onClick={resetSession} className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold text-xl shadow-lg">Nuova Sessione</button>
+                            <div className="flex gap-4">
+                                <button onClick={() => setCurrentPage('selection')} className="flex-1 bg-white text-slate-600 py-4 rounded-2xl font-bold border border-slate-200 hover:bg-slate-50 transition-all">Indietro</button>
+                                <button onClick={resetSession} className="flex-[2] bg-emerald-600 text-white py-4 rounded-2xl font-bold text-xl shadow-lg hover:bg-emerald-700 transition-all active:scale-95">Fine Sessione</button>
+                            </div>
                         </div>
                     )}
 
